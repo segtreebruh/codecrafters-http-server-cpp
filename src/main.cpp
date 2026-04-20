@@ -2,11 +2,45 @@
 #include <cstdlib>
 #include <string>
 #include <cstring>
+#include <cctype>
+#include <iomanip>
 #include <unistd.h>
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <arpa/inet.h>
 #include <netdb.h>
+
+struct HTTPRequest {
+  std::string req;
+  std::string headers;
+  std::string body;
+  
+  HTTPRequest() {}
+  HTTPRequest(std::string req, std::string headers, std::string body)
+    : req(req), headers(headers), body(body) {}
+
+  HTTPRequest(const std::string& request) {
+    size_t reqEndPos = request.find("\r\n");
+    // header end marked with extra \r\n
+    size_t headersEndPos = request.find("\r\n\r\n");
+
+    // if fail: return nothing
+    if (reqEndPos == std::string::npos || headersEndPos == std::string::npos) return;
+
+    req = request.substr(0, reqEndPos);
+    headers = request.substr(reqEndPos + 2, headersEndPos - (reqEndPos + 2));
+    body = request.substr(headersEndPos + 4);
+  }
+
+  // don't really need friend since everything public 
+  // but still write friend to remember syntax
+  friend std::ostream& operator<<(std::ostream& os, const HTTPRequest& request) {
+    os << "--REQ--\n" << request.req << "\n"
+          << "--HEADERS--\n" << request.headers << "\n"
+          << "--BODY--\n" << request.body << "\n";
+    return os;
+  }
+};
 
 int main(int argc, char **argv) {
   // Flush after every std::cout / std::cerr
@@ -56,8 +90,47 @@ int main(int argc, char **argv) {
   int client_fd = accept(server_fd, (struct sockaddr *) &client_addr, (socklen_t *) &client_addr_len);
   std::cout << "Client connected\n";
 
-  const char* response = "HTTP/1.1 200 OK\r\n\r\n";
-  send(client_fd, response, strlen(response), 0);
+  /*
+    Instead of using buffer (very low-level, error prone, mental math heavy), 
+    I tried to use string for easier handling
+  */
+  // char buffer[1024] = {0};
+  // recv(client_fd, buffer, sizeof(buffer), 0);
+  std::string rawRequest(1024, '\0');
+  // ssize_t: size_t but signed (so, can be -1)
+  ssize_t n = recv(client_fd, rawRequest.data(), rawRequest.size(), 0);
+  // resize to delete all trailing '\0'
+  // size_t: UNSIGNED. so check if n invalid first 
+  if (n > 0) rawRequest.resize(static_cast<size_t>(n));
+
+  for (size_t i = 0; i < rawRequest.size(); i++) {
+    if (rawRequest[i] == '\r') std::cout << "\\r";
+
+    // prefer using "\n" 
+    // "\n" do not flush output buffer
+    // while endl: basically cout << "\n" then std::flush(), flush output buffer after
+    // expensive operation, much slower
+    else if (rawRequest[i] == '\n') std::cout << "\\n";
+    else std::cout << rawRequest[i];
+  }
+  std::cout << "\n";
+
+  HTTPRequest request = HTTPRequest(rawRequest);
+  std::cout << request << '\n';
+
+  const char* responseOK = "HTTP/1.1 200 OK\r\n\r\n";
+  const char* responseNotFound = "HTTP/1.1 404 Not Found\r\n\r\n";
+  // send(client_fd, response, strlen(response), 0);
+
+  if (request.req.find("GET / ") != std::string::npos) { 
+    send(client_fd, responseOK, strlen(responseOK), 0);
+    std::cout << "OK";
+  }
+  else {
+    send(client_fd, responseNotFound, strlen(responseNotFound), 0);
+    std::cout << "404";
+  }
+  std::cout << "\n";
   
   close(client_fd);
   close(server_fd);
