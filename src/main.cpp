@@ -120,7 +120,8 @@ int main(int argc, char **argv) {
 
   std::string const response200 = "HTTP/1.1 200 OK\r\n\r\n";
   std::string const response404 = "HTTP/1.1 404 Not Found\r\n\r\n";
-  std::string echoResponse = "HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: 3\r\n\r\n";
+  std::string echoResponse = "HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\n";
+  std::string contentLength = "Content-Length: ";
   
   // send(client_fd, response, strlen(response), 0);
 
@@ -129,9 +130,13 @@ int main(int argc, char **argv) {
     std::cout << "OK";
   }
   else if (request.req.find("GET /echo/") != std::string::npos) {
-    echoResponse += request.body;
+    int echo = request.req.find("/echo") + 6;
+    int http = request.req.find("HTTP") - 1;
+    std::string content = request.req.substr(echo, http - echo);
+    echoResponse += contentLength + std::to_string(static_cast<int>(content.size())) + "\r\n\r\n";
+    echoResponse += content;
+    std::cout << echoResponse << "\n";
     send(client_fd, echoResponse.data(), echoResponse.size(), 0);
-    std::cout << "/echo/" << request.body;
   }
   else {
     send(client_fd, response404.data(), response404.size(), 0);
