@@ -118,22 +118,23 @@ int main(int argc, char **argv) {
   HTTPRequest request = HTTPRequest(rawRequest);
   std::cout << request << '\n';
 
-  const char* response200 = "HTTP/1.1 200 OK\r\n\r\n";
-  const char* response404 = "HTTP/1.1 404 Not Found\r\n\r\n";
-  const char* echoResponse = "HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: 3\r\n\r\nabc";
+  std::string const response200 = "HTTP/1.1 200 OK\r\n\r\n";
+  std::string const response404 = "HTTP/1.1 404 Not Found\r\n\r\n";
+  std::string echoResponse = "HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: 3\r\n\r\n";
   
   // send(client_fd, response, strlen(response), 0);
 
   if (request.req.find("GET / ") != std::string::npos) { 
-    send(client_fd, response200, strlen(response200), 0);
+    send(client_fd, response200.data(), response200.size(), 0);
     std::cout << "OK";
   }
-  else if (request.req.find("GET /echo/abc") != std::string::npos) {
-    send(client_fd, echoResponse, strlen(echoResponse), 0);
-    std::cout << "/echo/abc";
+  else if (request.req.find("GET /echo/") != std::string::npos) {
+    echoResponse += request.body;
+    send(client_fd, echoResponse.data(), echoResponse.size(), 0);
+    std::cout << "/echo/" << request.body;
   }
   else {
-    send(client_fd, response404, strlen(response404), 0);
+    send(client_fd, response404.data(), response404.size(), 0);
     std::cout << "404";
   }
   std::cout << "\n";
