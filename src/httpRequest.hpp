@@ -8,17 +8,17 @@ struct HTTPRequestHeader {
     std::string userAgent;
     std::string accept;
 
-    HTTPRequestHeader() {}
+    HTTPRequestHeader(): host(""), userAgent(""), accept("") {}
     HTTPRequestHeader(std::string const& host, std::string const& userAgent, std::string const& accept)
         : host(host), userAgent(userAgent), accept(accept) {}
 };
 
 struct HTTPRequest {
     std::string req;
-    HTTPRequestHeader headers;
+    HTTPRequestHeader header;
     std::string body;
 
-    HTTPRequest() {}
+    HTTPRequest(): req(""), header(HTTPRequestHeader()), body("") {}
     HTTPRequest(const std::string&);
 
     std::string str() const;

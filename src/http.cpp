@@ -5,7 +5,7 @@
 
 HTTPResponse parseResponse(HTTPRequest const& request) {
     if (request.req.find("GET / ") != std::string::npos)
-        return HTTPResponse("200 OK", HTTPResponseHeader("", 0), "");
+        return HTTPResponse("200 OK", HTTPResponseHeader(), "");
     if (request.req.find("GET /echo/") != std::string::npos)
         return parseEchoResponse(request);
     if (request.req.find("GET /user-agent") != std::string::npos)
@@ -26,7 +26,7 @@ HTTPResponse parseEchoResponse(HTTPRequest const& request) {
 }
 
 HTTPResponse parseUserAgentResponse(HTTPRequest const& request) {
-    std::string userAgent = request.headers.userAgent;
+    std::string userAgent = request.header.userAgent;
 
     return HTTPResponse("200 OK", HTTPResponseHeader::userAgent(request), userAgent);
 }

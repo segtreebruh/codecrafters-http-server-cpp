@@ -25,7 +25,7 @@ HTTPRequest::HTTPRequest(const std::string& request) {
                                               subheaderEndPos - acceptPos - acceptStr.size());
 
     req = request.substr(0, hostPos - 2);
-    headers = HTTPRequestHeader(host, userAgent, accept);
+    header = HTTPRequestHeader(host, userAgent, accept);
 
     // header end with \r\n\r\n
     size_t headerEndPos = request.find("\r\n\r\n");
@@ -34,8 +34,8 @@ HTTPRequest::HTTPRequest(const std::string& request) {
 
 std::string HTTPRequest::str() const {
     return req + "\n" +
-           "Host: " + headers.host + "\n" +
-           "User-Agent: " + headers.userAgent + "\n" +
-           "Accept: " + headers.accept + "\n\n" +
+           "Host: " + header.host + "\n" +
+           "User-Agent: " + header.userAgent + "\n" +
+           "Accept: " + header.accept + "\n\n" +
            body;
 }

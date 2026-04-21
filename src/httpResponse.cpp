@@ -14,7 +14,7 @@ HTTPResponseHeader HTTPResponseHeader::echo(const HTTPRequest& request) {
 }
 
 HTTPResponseHeader HTTPResponseHeader::userAgent(const HTTPRequest& request) {
-    std::string userAgent = request.headers.userAgent;
+    std::string userAgent = request.header.userAgent;
 
     return HTTPResponseHeader("text/plain", static_cast<int>(userAgent.size()));
 }

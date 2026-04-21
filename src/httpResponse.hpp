@@ -9,7 +9,7 @@ struct HTTPResponseHeader {
     std::string contentType;
     int contentLength;
 
-    HTTPResponseHeader() {}
+    HTTPResponseHeader(): contentType(""), contentLength(0) {}
     HTTPResponseHeader(const std::string&, int);
 
     static HTTPResponseHeader echo(const HTTPRequest&);
@@ -21,7 +21,7 @@ struct HTTPResponse {
     HTTPResponseHeader header;
     std::string body;
 
-    HTTPResponse() {}
+    HTTPResponse(): status(""), header(HTTPResponseHeader()), body("") {}
     HTTPResponse(const std::string& status,
                  HTTPResponseHeader const& header, std::string const& body)
         : status(status), header(header), body(body) {}
