@@ -1,71 +1,55 @@
 #ifndef HTTP_HPP
 #define HTTP_HPP
 
-#include <string>
 #include <iostream>
+#include <string>
 
-struct HTTPRequestHeader
-{
+struct HTTPRequestHeader {
   std::string host;
   std::string userAgent;
   std::string accept;
 
   HTTPRequestHeader() {}
-  HTTPRequestHeader(std::string host, std::string userAgent, std::string accept)
+  HTTPRequestHeader(std::string const& host, std::string const& userAgent, std::string const& accept)
       : host(host), userAgent(userAgent), accept(accept) {}
-
-  friend std::ostream &operator<<(std::ostream &os, const HTTPRequestHeader &header)
-  {
-    os << header.host << ' ' << header.userAgent << ' ' << header.accept;
-    return os;
-  }
 };
 
-struct HTTPRequest
-{
+struct HTTPRequest {
   std::string req;
   HTTPRequestHeader headers;
   std::string body;
 
   HTTPRequest() {}
-  HTTPRequest(const std::string &);
-
-  friend std::ostream &operator<<(std::ostream &os, const HTTPRequest &request)
-  {
-    os << request.req << request.headers << request.body << "\n";
-    return os;
-  }
+  HTTPRequest(const std::string&);
+  std::string str() const;
 };
 
-struct HTTPResponseHeader
-{
-  std::string contentType = "Content-Type: text/plain\r\n";
-  std::string contentLength;
+struct HTTPResponseHeader {
+  std::string contentType;
+  int contentLength;
 
   HTTPResponseHeader() {}
-  HTTPResponseHeader(const std::string &);
+  HTTPResponseHeader(const std::string&, int);
 
-  friend std::ostream &operator<<(std::ostream &os, const HTTPResponseHeader &header)
-  {
-    os << header.contentType << ' ' << header.contentLength << ' ';
-    return os;
-  }
+  static HTTPResponseHeader echo(const HTTPRequest&);
+  static HTTPResponseHeader userAgent(const HTTPRequest&);
 };
 
-struct HTTPResponse
-{
+struct HTTPResponse {
   std::string status;
   HTTPResponseHeader header;
   std::string body;
 
   HTTPResponse() {}
-  HTTPResponse(const HTTPRequest &);
+  HTTPResponse(const std::string& status,
+               HTTPResponseHeader const& header, std::string const& body)
+      : status(status), header(header), body(body) {}
 
-  friend std::ostream &operator<<(std::ostream &os, const HTTPResponse &response)
-  {
-    os << response.status << response.header << response.body << "\n";
-    return os;
-  }
+  std::string str() const;
 };
+
+HTTPResponse parseEchoResponse(HTTPRequest const&);
+HTTPResponse parseUserAgentResponse(HTTPRequest const&);
+HTTPResponse parseResponse(HTTPRequest const&);
 
 #endif
