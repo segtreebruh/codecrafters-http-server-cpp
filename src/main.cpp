@@ -10,37 +10,7 @@
 #include <arpa/inet.h>
 #include <netdb.h>
 
-struct HTTPRequest {
-  std::string req;
-  std::string headers;
-  std::string body;
-  
-  HTTPRequest() {}
-  HTTPRequest(std::string req, std::string headers, std::string body)
-    : req(req), headers(headers), body(body) {}
-
-  HTTPRequest(const std::string& request) {
-    size_t reqEndPos = request.find("\r\n");
-    // header end marked with extra \r\n
-    size_t headersEndPos = request.find("\r\n\r\n");
-
-    // if fail: return nothing
-    if (reqEndPos == std::string::npos || headersEndPos == std::string::npos) return;
-
-    req = request.substr(0, reqEndPos);
-    headers = request.substr(reqEndPos + 2, headersEndPos - (reqEndPos + 2));
-    body = request.substr(headersEndPos + 4);
-  }
-
-  // don't really need friend since everything public 
-  // but still write friend to remember syntax
-  friend std::ostream& operator<<(std::ostream& os, const HTTPRequest& request) {
-    os << "--REQ--\n" << request.req << "\n"
-          << "--HEADERS--\n" << request.headers << "\n"
-          << "--BODY--\n" << request.body << "\n";
-    return os;
-  }
-};
+#include "http.hpp"
 
 int main(int argc, char **argv) {
   // Flush after every std::cout / std::cerr
@@ -135,7 +105,7 @@ int main(int argc, char **argv) {
     std::string content = request.req.substr(echo, http - echo);
     echoResponse += contentLength + std::to_string(static_cast<int>(content.size())) + "\r\n\r\n";
     echoResponse += content;
-    std::cout << echoResponse << "\n";
+    std::cout << echoResponse;
     send(client_fd, echoResponse.data(), echoResponse.size(), 0);
   }
   else {
