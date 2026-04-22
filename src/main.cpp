@@ -10,10 +10,38 @@
 #include <iomanip>
 #include <iostream>
 #include <string>
+#include <thread>
 
 #include "http.hpp"
 #include "httpRequest.hpp"
 #include "httpResponse.hpp"
+
+void handleClientRequest(int client_fd) {
+    std::cout << "Client connected\n\n";
+
+    std::string rawRequest(1024, '\0');
+    ssize_t n = recv(client_fd, rawRequest.data(), rawRequest.size(), 0);
+    if (n > 0) rawRequest.resize(static_cast<size_t>(n));
+
+    for (size_t i = 0; i < rawRequest.size(); i++) {
+        if (rawRequest[i] == '\r')
+            std::cout << "\\r";
+        else if (rawRequest[i] == '\n')
+            std::cout << "\\n";
+        else
+            std::cout << rawRequest[i];
+    }
+    std::cout << "\n\n";
+
+    HTTPRequest request = HTTPRequest(rawRequest);
+    std::cout << request.str() << std::endl;
+    HTTPResponse response = parseResponse(request);
+
+    send(client_fd, response.str().data(), response.str().size(), 0);
+    std::cout << response.str() << "\n";
+
+    close(client_fd);
+}
 
 int main(int argc, char** argv) {
     // Flush after every std::cout / std::cerr
@@ -55,42 +83,21 @@ int main(int argc, char** argv) {
         return 1;
     }
 
-    struct sockaddr_in client_addr;
-    int client_addr_len = sizeof(client_addr);
+    while (true) {
+        struct sockaddr_in client_addr;
+        socklen_t client_addr_len = sizeof(client_addr);
 
-    std::cout << "Waiting for a client to connect...\n";
+        std::cout << "Waiting for a client to connect...\n";
 
-    int client_fd = accept(server_fd, (struct sockaddr*)&client_addr, (socklen_t*)&client_addr_len);
-    std::cout << "Client connected\n\n";
+        int client_fd = accept(server_fd, (struct sockaddr*)&client_addr, &client_addr_len);
+        if (client_fd < 0) {
+            std::cerr << "accept failed\n";
+            continue;
+        }
 
-    /*
-      Instead of using buffer (very low-level, error prone, mental math heavy),
-      I tried to use string for easier handling
-    */
-
-    std::string rawRequest(1024, '\0');
-    ssize_t n = recv(client_fd, rawRequest.data(), rawRequest.size(), 0);
-    // resize to delete all trailing '\0'
-    if (n > 0) rawRequest.resize(static_cast<size_t>(n));
-
-    for (size_t i = 0; i < rawRequest.size(); i++) {
-        if (rawRequest[i] == '\r')
-            std::cout << "\\r";
-        else if (rawRequest[i] == '\n')
-            std::cout << "\\n";
-        else
-            std::cout << rawRequest[i];
+        std::thread(handleClientRequest, client_fd).detach();
     }
-    std::cout << "\n\n";
 
-    HTTPRequest request = HTTPRequest(rawRequest);
-    std::cout << request.str() << std::endl;
-    HTTPResponse response = parseResponse(request);
-
-    send(client_fd, response.str().data(), response.str().size(), 0);
-    std::cout << response.str() << "\n";
-
-    close(client_fd);
     close(server_fd);
 
     return 0;
