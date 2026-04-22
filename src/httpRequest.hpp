@@ -14,11 +14,13 @@ struct HTTPRequestHeader {
 };
 
 struct HTTPRequest {
+    std::string method;
+    std::string path;
     std::string req;
     HTTPRequestHeader header;
     std::string body;
 
-    HTTPRequest(): req(""), header(HTTPRequestHeader()), body("") {}
+    HTTPRequest(): req(""), method(""), path(""), header(HTTPRequestHeader()), body("") {}
     HTTPRequest(const std::string&);
 
     std::string str() const;
