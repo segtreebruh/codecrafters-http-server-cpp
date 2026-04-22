@@ -3,25 +3,25 @@
 
 #include <string>
 
-struct HTTPRequestHeader {
+struct HttpRequestHeader {
     std::string host;
     std::string userAgent;
     std::string accept;
 
-    HTTPRequestHeader(): host(""), userAgent(""), accept("") {}
-    HTTPRequestHeader(std::string const& host, std::string const& userAgent, std::string const& accept)
+    HttpRequestHeader(): host(""), userAgent(""), accept("") {}
+    HttpRequestHeader(std::string const& host, std::string const& userAgent, std::string const& accept)
         : host(host), userAgent(userAgent), accept(accept) {}
 };
 
-struct HTTPRequest {
+struct HttpRequest {
     std::string method;
     std::string path;
     std::string req;
-    HTTPRequestHeader header;
+    HttpRequestHeader header;
     std::string body;
 
-    HTTPRequest(): req(""), method(""), path(""), header(HTTPRequestHeader()), body("") {}
-    HTTPRequest(const std::string&);
+    HttpRequest(): req(""), method(""), path(""), header(HttpRequestHeader()), body("") {}
+    HttpRequest(const std::string&);
 
     std::string str() const;
 };

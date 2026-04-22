@@ -1,6 +1,6 @@
 #include "httpRequest.hpp"
 
-HTTPRequest::HTTPRequest(const std::string& request) {
+HttpRequest::HttpRequest(const std::string& request) {
     const std::string hostStr = "Host: ",
                       userAgentStr = "User-Agent: ",
                       acceptStr = "Accept: ";
@@ -32,14 +32,14 @@ HTTPRequest::HTTPRequest(const std::string& request) {
     method = request.substr(0, methodEndPos + 1);
     path = request.substr(methodEndPos + 2, pathEndPos - (methodEndPos + 2) + 1);
 
-    header = HTTPRequestHeader(host, userAgent, accept);
+    header = HttpRequestHeader(host, userAgent, accept);
 
     // header end with \r\n\r\n
     size_t headerEndPos = request.find("\r\n\r\n");
     body = request.substr(headerEndPos + 4);
 }
 
-std::string HTTPRequest::str() const {
+std::string HttpRequest::str() const {
     return method + " " + path + " " + "HTTP/1.1" + "\n" +
            "Host: " + header.host + "\n" +
            "User-Agent: " + header.userAgent + "\n" +

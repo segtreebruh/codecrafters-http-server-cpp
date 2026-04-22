@@ -5,8 +5,8 @@
 #include "httpRequest.hpp"
 #include "httpResponse.hpp"
 
-HTTPResponse indexHandler(const HTTPRequest&);
-HTTPResponse echoHandler(const HTTPRequest&);
-HTTPResponse userAgentHandler(const HTTPRequest&);
+HttpResponse indexHandler(const HttpRequest&);
+HttpResponse echoHandler(const HttpRequest&);
+HttpResponse userAgentHandler(const HttpRequest&);
 
 #endif

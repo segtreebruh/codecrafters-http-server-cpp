@@ -4,7 +4,7 @@ void Router::addRoute(std::string const& method, std::string const& pattern, Han
     routes.push_back({method, pattern, handler});
 }
 
-HTTPResponse Router::dispatch(HTTPRequest const& request) const {
+HttpResponse Router::dispatch(HttpRequest const& request) const {
     for (const auto& route: routes) {
         if (route.method != request.method) continue;
 
@@ -13,6 +13,6 @@ HTTPResponse Router::dispatch(HTTPRequest const& request) const {
         if (match) return route.handler(request);
     }
 
-    return HTTPResponse("404 Not Found", HTTPResponseHeader(), "");
+    return HttpResponse("404 Not Found", HttpResponseHeader(), "");
 }
 

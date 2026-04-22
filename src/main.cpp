@@ -33,9 +33,9 @@ void handleClientRequest(int client_fd, const Router& router) {
     ssize_t n = recv(client_fd, rawRequest.data(), rawRequest.size(), 0);
     if (n > 0) rawRequest.resize(static_cast<size_t>(n));
 
-    HTTPRequest request(rawRequest);
+    HttpRequest request(rawRequest);
     std::cout << request.str() << std::endl;
-    HTTPResponse response = router.dispatch(request);
+    HttpResponse response = router.dispatch(request);
 
     send(client_fd, response.str().data(), response.str().size(), 0);
     std::cout << response.str() << "\n";

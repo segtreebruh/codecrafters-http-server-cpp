@@ -5,25 +5,22 @@
 
 #include "httpRequest.hpp"
 
-struct HTTPResponseHeader {
+struct HttpResponseHeader {
     std::string contentType;
     int contentLength;
 
-    HTTPResponseHeader(): contentType(""), contentLength(0) {}
-    HTTPResponseHeader(const std::string&, int);
-
-    static HTTPResponseHeader echo(const HTTPRequest&);
-    static HTTPResponseHeader userAgent(const HTTPRequest&);
+    HttpResponseHeader(): contentType(""), contentLength(0) {}
+    HttpResponseHeader(const std::string&, int);
 };
 
-struct HTTPResponse {
+struct HttpResponse {
     std::string status;
-    HTTPResponseHeader header;
+    HttpResponseHeader header;
     std::string body;
 
-    HTTPResponse(): status(""), header(HTTPResponseHeader()), body("") {}
-    HTTPResponse(const std::string& status,
-                 HTTPResponseHeader const& header, std::string const& body)
+    HttpResponse(): status(""), header(HttpResponseHeader()), body("") {}
+    HttpResponse(const std::string& status,
+                 HttpResponseHeader const& header, std::string const& body)
         : status(status), header(header), body(body) {}
 
     std::string str() const;

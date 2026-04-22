@@ -9,7 +9,7 @@
 #include "httpRequest.hpp"
 #include "httpResponse.hpp"
 
-using Handler = std::function<HTTPResponse(HTTPRequest const&)>;
+using Handler = std::function<HttpResponse(HttpRequest const&)>;
 
 struct Route {
     std::string method;
@@ -22,7 +22,7 @@ struct Route {
 
 struct Router {
     void addRoute(std::string const&, std::string const&, Handler);
-    HTTPResponse dispatch(HTTPRequest const&) const;
+    HttpResponse dispatch(HttpRequest const&) const;
     std::vector<Route> routes;
 };
 

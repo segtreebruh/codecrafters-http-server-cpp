@@ -1,22 +1,27 @@
 #include "controller.hpp"
 
-HTTPResponse indexHandler(const HTTPRequest&) {
-    return HTTPResponse("200 OK", HTTPResponseHeader(), "");
+HttpResponse indexHandler(const HttpRequest&) {
+    return HttpResponse("200 OK", HttpResponseHeader(), "");
 }
 
-HTTPResponse echoHandler(const HTTPRequest& request) {
+HttpResponse echoHandler(const HttpRequest& request) {
     size_t echoPos = request.req.find("/echo/");
     size_t httpPos = request.req.find(" HTTP/");
     if (echoPos == std::string::npos || httpPos == std::string::npos) {
-        return HTTPResponse("404 Not Found", HTTPResponseHeader(), "");
+        return HttpResponse("404 Not Found", HttpResponseHeader(), "");
     }
 
-    std::string content = request.req.substr(echoPos + 6, httpPos - (echoPos + 6));
-    return HTTPResponse("200 OK", HTTPResponseHeader::echo(request), content);
+    std::string body = request.req.substr(echoPos + 6, httpPos - (echoPos + 6));
+    HttpResponseHeader header =
+        HttpResponseHeader("text/plain", static_cast<int>(body.size()));
+
+    return HttpResponse("200 OK", header, body);
 }
 
-HTTPResponse userAgentHandler(HTTPRequest const& request) {
-    std::string userAgent = request.header.userAgent;
+HttpResponse userAgentHandler(HttpRequest const& request) {
+    std::string body = request.header.userAgent;
+    HttpResponseHeader header = 
+        HttpResponseHeader("text/plain", static_cast<int>(body.size()));
 
-    return HTTPResponse("200 OK", HTTPResponseHeader::userAgent(request), userAgent);
+    return HttpResponse("200 OK", header, body);
 }
