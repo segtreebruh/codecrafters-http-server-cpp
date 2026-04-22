@@ -12,30 +12,30 @@
 #include <string>
 #include <thread>
 
-#include "http.hpp"
+#include "controller.hpp"
 #include "httpRequest.hpp"
 #include "httpResponse.hpp"
+#include "router.hpp"
 
-void handleClientRequest(int client_fd) {
+static Router buildRouter() {
+    Router router;
+    router.addRoute("GET", "^/$", indexHandler);
+    router.addRoute("GET", "^/echo/", echoHandler);
+    router.addRoute("GET", "^/user-agent$", userAgentHandler);
+
+    return router;
+}
+
+void handleClientRequest(int client_fd, const Router& router) {
     std::cout << "Client connected\n\n";
 
     std::string rawRequest(1024, '\0');
     ssize_t n = recv(client_fd, rawRequest.data(), rawRequest.size(), 0);
     if (n > 0) rawRequest.resize(static_cast<size_t>(n));
 
-    for (size_t i = 0; i < rawRequest.size(); i++) {
-        if (rawRequest[i] == '\r')
-            std::cout << "\\r";
-        else if (rawRequest[i] == '\n')
-            std::cout << "\\n";
-        else
-            std::cout << rawRequest[i];
-    }
-    std::cout << "\n\n";
-
-    HTTPRequest request = HTTPRequest(rawRequest);
+    HTTPRequest request(rawRequest);
     std::cout << request.str() << std::endl;
-    HTTPResponse response = parseResponse(request);
+    HTTPResponse response = router.dispatch(request);
 
     send(client_fd, response.str().data(), response.str().size(), 0);
     std::cout << response.str() << "\n";
@@ -83,6 +83,8 @@ int main(int argc, char** argv) {
         return 1;
     }
 
+    Router router = buildRouter();
+
     while (true) {
         struct sockaddr_in client_addr;
         socklen_t client_addr_len = sizeof(client_addr);
@@ -95,7 +97,9 @@ int main(int argc, char** argv) {
             continue;
         }
 
-        std::thread(handleClientRequest, client_fd).detach();
+        std::thread([client_fd, &router]() {
+            handleClientRequest(client_fd, router);
+        }).detach();
     }
 
     close(server_fd);
