@@ -17,11 +17,16 @@
 #include "httpResponse.hpp"
 #include "router.hpp"
 
-static Router buildRouter() {
+static Router buildRouter(std::string const& directory = "") {
     Router router;
     router.addRoute("GET", "^/$", indexHandler);
     router.addRoute("GET", "^/echo/", echoHandler);
     router.addRoute("GET", "^/user-agent$", userAgentHandler);
+    
+    FileController fileController(directory);
+    router.addRoute("GET", "^/files/", [fileController](HttpRequest const& req) {
+        return fileController.handle(req);
+    });
 
     return router;
 }
@@ -50,8 +55,11 @@ int main(int argc, char** argv) {
 
     // You can use print statements as follows for debugging, they'll be visible when running tests.
     std::cout << "Logs from your program will appear here!\n";
-
-    // TODO: Uncomment the code below to pass the first stage
+    
+    std::string directory;
+    if (argc == 3) {
+        if (std::string(argv[1]) == "--directory") directory = argv[2];
+    }
 
     int server_fd = socket(AF_INET, SOCK_STREAM, 0);
     if (server_fd < 0) {
@@ -83,7 +91,7 @@ int main(int argc, char** argv) {
         return 1;
     }
 
-    Router router = buildRouter();
+    Router router = buildRouter(directory);
 
     while (true) {
         struct sockaddr_in client_addr;

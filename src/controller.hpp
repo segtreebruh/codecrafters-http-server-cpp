@@ -9,4 +9,11 @@ HttpResponse indexHandler(const HttpRequest&);
 HttpResponse echoHandler(const HttpRequest&);
 HttpResponse userAgentHandler(const HttpRequest&);
 
+struct FileController {
+    std::string directory;
+
+    FileController(std::string const& directory): directory(directory) {}
+    HttpResponse handle(const HttpRequest&) const;
+};
+
 #endif
