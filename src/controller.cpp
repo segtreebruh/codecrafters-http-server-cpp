@@ -28,7 +28,7 @@ HttpResponse userAgentHandler(HttpRequest const& request) {
     return HttpResponse("200 OK", header, body);
 }
 
-HttpResponse FileController::handle(HttpRequest const& request) const {
+HttpResponse FileController::get(HttpRequest const& request) const {
     std::string filename = request.path.substr(std::string("/files/").size());
     std::string filepath = directory + "/" + filename;
 
@@ -43,4 +43,14 @@ HttpResponse FileController::handle(HttpRequest const& request) const {
 
     HttpResponseHeader header("application/octet-stream", static_cast<int>(body.size()));
     return HttpResponse("200 OK", header, body);
+}
+
+HttpResponse FileController::post(const HttpRequest& request) const {
+    std::string filename = request.path.substr(std::string("/files/").size());
+    std::string filepath = directory + "/" + filename;
+
+    std::ofstream file(filepath, std::ios::binary);
+    file << request.body;
+
+    return HttpResponse("201 Created", HttpResponseHeader(), "");
 }

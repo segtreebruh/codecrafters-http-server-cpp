@@ -25,7 +25,10 @@ static Router buildRouter(std::string const& directory = "") {
     
     FileController fileController(directory);
     router.addRoute("GET", "^/files/", [fileController](HttpRequest const& req) {
-        return fileController.handle(req);
+        return fileController.get(req);
+    });
+    router.addRoute("POST", "^/files/", [fileController](HttpRequest const& req) {
+        return fileController.post(req);
     });
 
     return router;

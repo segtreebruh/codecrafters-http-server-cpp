@@ -13,7 +13,8 @@ struct FileController {
     std::string directory;
 
     FileController(std::string const& directory): directory(directory) {}
-    HttpResponse handle(const HttpRequest&) const;
+    HttpResponse get(const HttpRequest&) const;
+    HttpResponse post(const HttpRequest&) const;
 };
 
 #endif
