@@ -10,7 +10,8 @@ std::string HttpResponse::str() const {
     std::string raw = "HTTP/1.1 " + status + "\r\n";
 
     if (header.contentType.size()) {
-        if (header.contentEncoding.size()) 
+        // only accept gzip encoding
+        if (header.contentEncoding == "gzip") 
             raw += "Content-Encoding: " + header.contentEncoding + "\r\n";
         raw += "Content-Type: " + header.contentType + "\r\n";
         raw += "Content-Length: " + std::to_string(header.contentLength);

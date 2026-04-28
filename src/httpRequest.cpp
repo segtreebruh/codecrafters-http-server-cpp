@@ -53,7 +53,7 @@ std::string HttpRequest::str() const {
     return method + " " + path + " " + "HTTP/1.1" + "\n" +
            "Host: " + header.host + "\n" +
            "User-Agent: " + header.userAgent + "\n" +
-           "Accept: " + header.accept + "\n\n" +
-           "Accept-Encoding: " + header.acceptEncoding + "\n\n" +
-           body;
+           "Accept: " + header.accept + "\n" +
+           "Accept-Encoding: " + header.acceptEncoding + "\n" +
+           + "\n" + body;
 }
