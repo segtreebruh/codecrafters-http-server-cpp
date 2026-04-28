@@ -15,11 +15,11 @@ HttpResponse echoHandler(const HttpRequest& request) {
 
     std::string body = request.req.substr(echoPos + 6, httpPos - (echoPos + 6));
 
-    HttpResponseHeader header;
-    header.contentType = "text/plain";
-    header.contentLength = static_cast<int>(body.size());
-    if (request.header.acceptEncoding.size()) 
-        header.contentEncoding = request.header.acceptEncoding;
+    HttpResponseHeader header = HttpResponseHeader(
+        "text/plain",
+        static_cast<int>(body.size()),
+        request.header.acceptEncodings
+    );
 
     return HttpResponse("200 OK", header, body);
 }
@@ -30,8 +30,8 @@ HttpResponse userAgentHandler(HttpRequest const& request) {
     HttpResponseHeader header;
     header.contentType = "text/plain";
     header.contentLength = static_cast<int>(body.size());
-    if (request.header.acceptEncoding.size()) 
-        header.contentEncoding = request.header.acceptEncoding;
+    if (request.header.acceptEncodings.size()) 
+        header._contentEncodings = request.header.acceptEncodings;
 
     return HttpResponse("200 OK", header, body);
 }
@@ -52,9 +52,9 @@ HttpResponse FileController::get(HttpRequest const& request) const {
     HttpResponseHeader header;
     header.contentType = "application/octet-stream";
     header.contentLength = static_cast<int>(body.size());
-    if (request.header.acceptEncoding.size()) 
-        header.contentEncoding = request.header.acceptEncoding;
-        
+    if (request.header.acceptEncodings.size()) 
+        header._contentEncodings = request.header.acceptEncodings;
+
     return HttpResponse("200 OK", header, body);
 }
 

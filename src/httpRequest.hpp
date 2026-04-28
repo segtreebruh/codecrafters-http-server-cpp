@@ -2,17 +2,18 @@
 #define HTTPREQUEST_HPP
 
 #include <string>
+#include <vector>
 
 struct HttpRequestHeader {
     std::string host;
     std::string userAgent;
     std::string accept;
-    std::string acceptEncoding;
+    std::vector<std::string> acceptEncodings;
 
     HttpRequestHeader() = default;
     HttpRequestHeader(std::string const& host, std::string const& userAgent,
-                      std::string const& accept, std::string const& acceptEncoding)
-        : host(host), userAgent(userAgent), accept(accept), acceptEncoding(acceptEncoding) {}
+                      std::string const& accept, std::vector<std::string> const& acceptEncodings)
+        : host(host), userAgent(userAgent), accept(accept), acceptEncodings(acceptEncodings) {}
 };
 
 struct HttpRequest {

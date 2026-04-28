@@ -8,10 +8,10 @@
 struct HttpResponseHeader {
     std::string contentType;
     int contentLength = 0;
-    std::string contentEncoding;
+    std::vector<std::string> _contentEncodings;
 
     HttpResponseHeader() = default;
-    HttpResponseHeader(const std::string&, int, std::string const&);
+    HttpResponseHeader(const std::string&, int, std::vector<std::string> const&);
 };
 
 struct HttpResponse {
