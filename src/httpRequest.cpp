@@ -3,11 +3,13 @@
 HttpRequest::HttpRequest(const std::string& request) {
     const std::string hostStr = "Host: ",
                       userAgentStr = "User-Agent: ",
-                      acceptStr = "Accept: ";
+                      acceptStr = "Accept: ",
+                      acceptEncodingStr = "Accept-Encoding: ";
 
     size_t hostPos = request.find(hostStr);
     size_t userAgentPos = request.find(userAgentStr);
     size_t acceptPos = request.find(acceptStr);
+    size_t acceptEncodingPos = request.find(acceptEncodingStr);
 
     size_t subheaderEndPos;
 
@@ -24,6 +26,14 @@ HttpRequest::HttpRequest(const std::string& request) {
     const std::string accept = request.substr(acceptPos + acceptStr.size(),
                                               subheaderEndPos - acceptPos - acceptStr.size());
 
+    std::string acceptEncoding;
+    if (acceptEncodingPos != std::string::npos) {
+        subheaderEndPos = request.find("\r\n", acceptEncodingPos);
+        acceptEncoding = request.substr(
+            acceptEncodingPos + acceptEncodingStr.size(),
+            subheaderEndPos - acceptEncodingPos - acceptEncodingStr.size());
+    }
+
     req = request.substr(0, hostPos - 2);
 
     size_t methodEndPos = request.find("/") - 2;
@@ -32,7 +42,7 @@ HttpRequest::HttpRequest(const std::string& request) {
     method = request.substr(0, methodEndPos + 1);
     path = request.substr(methodEndPos + 2, pathEndPos - (methodEndPos + 2) + 1);
 
-    header = HttpRequestHeader(host, userAgent, accept);
+    header = HttpRequestHeader(host, userAgent, accept, acceptEncoding);
 
     // header end with \r\n\r\n
     size_t headerEndPos = request.find("\r\n\r\n");
@@ -44,5 +54,6 @@ std::string HttpRequest::str() const {
            "Host: " + header.host + "\n" +
            "User-Agent: " + header.userAgent + "\n" +
            "Accept: " + header.accept + "\n\n" +
+           "Accept-Encoding: " + header.acceptEncoding + "\n\n" +
            body;
 }

@@ -1,12 +1,17 @@
 #include "httpResponse.hpp"
 
-HttpResponseHeader::HttpResponseHeader(std::string const& contentType, int contentLength)
-    : contentType(contentType), contentLength(contentLength) {}
+HttpResponseHeader::HttpResponseHeader(std::string const& contentType, int contentLength,
+                                       std::string const& contentEncoding)
+    : contentType(contentType),
+      contentLength(contentLength),
+      contentEncoding(contentEncoding) {}
 
 std::string HttpResponse::str() const {
     std::string raw = "HTTP/1.1 " + status + "\r\n";
 
     if (header.contentType.size()) {
+        if (header.contentEncoding.size()) 
+            raw += "Content-Encoding: " + header.contentEncoding + "\r\n";
         raw += "Content-Type: " + header.contentType + "\r\n";
         raw += "Content-Length: " + std::to_string(header.contentLength);
     }

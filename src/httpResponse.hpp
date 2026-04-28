@@ -7,10 +7,11 @@
 
 struct HttpResponseHeader {
     std::string contentType;
-    int contentLength;
+    int contentLength = 0;
+    std::string contentEncoding;
 
-    HttpResponseHeader(): contentType(""), contentLength(0) {}
-    HttpResponseHeader(const std::string&, int);
+    HttpResponseHeader() = default;
+    HttpResponseHeader(const std::string&, int, std::string const&);
 };
 
 struct HttpResponse {
@@ -18,7 +19,7 @@ struct HttpResponse {
     HttpResponseHeader header;
     std::string body;
 
-    HttpResponse(): status(""), header(HttpResponseHeader()), body("") {}
+    HttpResponse() = default;
     HttpResponse(const std::string& status,
                  HttpResponseHeader const& header, std::string const& body)
         : status(status), header(header), body(body) {}
