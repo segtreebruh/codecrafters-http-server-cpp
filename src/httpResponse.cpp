@@ -1,12 +1,23 @@
 #include "httpResponse.hpp"
 
-HttpResponseHeader::HttpResponseHeader(std::string const& contentType, int contentLength,
-                                       std::vector<std::string> const& contentEncodings)
-    : contentType(contentType),
-      contentLength(contentLength) {
-    for (const auto& s : contentEncodings) {
-        if (s == "gzip") _contentEncodings.push_back(s);
+#include "gzip.hpp"
+
+HttpResponse::HttpResponse(std::string const& status,
+                           std::string const& contentType, std::string body,
+                           std::vector<std::string> const& encodings) : status(status) {
+    std::vector<std::string> contentEncoding;
+
+    for (const auto& s : encodings) {
+        if (s == "gzip") {
+            body = compress_gzip(body);
+            contentEncoding.push_back("gzip");
+        }
     }
+
+    this->body = body;
+    header = HttpResponseHeader(contentType,
+                                static_cast<int>(this->body.size()),
+                                contentEncoding);
 }
 
 std::string HttpResponse::str() const {

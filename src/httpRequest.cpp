@@ -29,22 +29,22 @@ HttpRequest::HttpRequest(const std::string& request) {
     const std::string accept = request.substr(acceptPos + acceptStr.size(),
                                               subheaderEndPos - acceptPos - acceptStr.size());
 
-    std::string acceptEncoding;
+    std::string encoding;
     if (acceptEncodingPos != std::string::npos) {
         subheaderEndPos = request.find("\r\n", acceptEncodingPos);
-        acceptEncoding = request.substr(
+        encoding = request.substr(
             acceptEncodingPos + acceptEncodingStr.size(),
             subheaderEndPos - acceptEncodingPos - acceptEncodingStr.size());
     }
     
     // acceptEncodings = acceptEncoding.split(',');
-    std::vector<std::string> acceptEncodings;
-    std::istringstream ss(acceptEncoding);
+    std::vector<std::string> acceptEncoding;
+    std::istringstream ss(encoding);
     std::string token;
     while (std::getline(ss, token, ',')) {
         size_t start = token.find_first_not_of(' ');
         if (start != std::string::npos)
-            acceptEncodings.push_back(token.substr(start));
+            acceptEncoding.push_back(token.substr(start));
     }
 
     req = request.substr(0, hostPos - 2);
@@ -55,7 +55,7 @@ HttpRequest::HttpRequest(const std::string& request) {
     method = request.substr(0, methodEndPos + 1);
     path = request.substr(methodEndPos + 2, pathEndPos - (methodEndPos + 2) + 1);
 
-    header = HttpRequestHeader(host, userAgent, accept, acceptEncodings);
+    header = HttpRequestHeader(host, userAgent, accept, acceptEncoding);
 
     // header end with \r\n\r\n
     size_t headerEndPos = request.find("\r\n\r\n");
