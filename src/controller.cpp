@@ -1,6 +1,7 @@
 #include "controller.hpp"
 #include <fstream>
 #include <sstream>
+#include "gzip.hpp"
 
 HttpResponse indexHandler(const HttpRequest&) {
     return HttpResponse("200 OK", HttpResponseHeader(), "");
@@ -8,6 +9,9 @@ HttpResponse indexHandler(const HttpRequest&) {
 
 HttpResponse echoHandler(const HttpRequest& request) {
     std::string body = request.path.substr(6); // strip "/echo/"
+    for (const auto& s: request.header.acceptEncodings) {
+        if (s == "gzip") body = compress_gzip(body);
+    }
 
     HttpResponseHeader header = HttpResponseHeader(
         "text/plain",

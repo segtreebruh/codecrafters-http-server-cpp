@@ -17,6 +17,7 @@
 #include "httpResponse.hpp"
 #include "router.hpp"
 
+// manual dependency injection
 static Router buildRouter(std::string const& directory = "") {
     Router router;
     router.addRoute("GET", "^/$", indexHandler);
