@@ -23,7 +23,7 @@ static Router buildRouter(std::string const& directory = "") {
     router.addRoute("GET", "^/$", indexHandler);
     router.addRoute("GET", "^/echo/", echoHandler);
     router.addRoute("GET", "^/user-agent$", userAgentHandler);
-    
+
     FileController fileController(directory);
     router.addRoute("GET", "^/files/", [fileController](HttpRequest const& req) {
         return fileController.get(req);
@@ -38,16 +38,19 @@ static Router buildRouter(std::string const& directory = "") {
 void handleClientRequest(int client_fd, const Router& router) {
     std::cout << "Client connected\n\n";
 
-    std::string rawRequest(1024, '\0');
-    ssize_t n = recv(client_fd, rawRequest.data(), rawRequest.size(), 0);
-    if (n > 0) rawRequest.resize(static_cast<size_t>(n));
+    while (true) {
+        std::string rawRequest(1024, '\0');
+        ssize_t n = recv(client_fd, rawRequest.data(), rawRequest.size(), 0);
+        if (n <= 0) break; // recv error - break
+        rawRequest.resize(static_cast<size_t>(n));
 
-    HttpRequest request(rawRequest);
-    std::cout << request.str() << std::endl;
-    HttpResponse response = router.dispatch(request);
+        HttpRequest request(rawRequest);
+        std::cout << request.str() << std::endl;
+        HttpResponse response = router.dispatch(request);
 
-    send(client_fd, response.str().data(), response.str().size(), 0);
-    std::cout << response.str() << "\n";
+        send(client_fd, response.str().data(), response.str().size(), 0);
+        std::cout << response.str() << "\n";
+    }
 
     close(client_fd);
 }

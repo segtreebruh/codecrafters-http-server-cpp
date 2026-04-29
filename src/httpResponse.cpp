@@ -32,9 +32,9 @@ std::string HttpResponse::str() const {
             raw += "Content-Encoding: " + encodings + "\r\n";
         }
         raw += "Content-Type: " + header.contentType + "\r\n";
-        raw += "Content-Length: " + std::to_string(header.contentLength);
+        raw += "Content-Length: " + std::to_string(header.contentLength) + "\r\n";
     }
-    raw += "\r\n\r\n";
+    raw += "\r\n";
     raw += body;
     return raw;
 }

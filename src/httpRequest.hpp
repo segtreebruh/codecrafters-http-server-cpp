@@ -19,7 +19,6 @@ struct HttpRequestHeader {
 struct HttpRequest {
     std::string method;
     std::string path;
-    std::string req;
     HttpRequestHeader header;
     std::string body;
 
