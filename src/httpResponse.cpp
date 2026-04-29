@@ -23,6 +23,8 @@ HttpResponse::HttpResponse(std::string const& status,
 std::string HttpResponse::str() const {
     std::string raw = "HTTP/1.1 " + status + "\r\n";
 
+    if (!header.connection.empty())
+        raw += "Connection: " + header.connection + "\r\n";
     if (header.contentType.size()) {
         if (header._contentEncodings.size()) {
             std::string encodings;

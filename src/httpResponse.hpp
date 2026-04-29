@@ -9,6 +9,7 @@ struct HttpResponseHeader {
     std::string contentType;
     int contentLength = 0;
     std::vector<std::string> _contentEncodings;
+    std::string connection;
 
     HttpResponseHeader() = default;
     HttpResponseHeader(const std::string& contentType, int contentLength, std::vector<std::string> const& contentEncodings)

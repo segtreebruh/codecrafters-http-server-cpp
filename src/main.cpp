@@ -48,8 +48,13 @@ void handleClientRequest(int client_fd, const Router& router) {
         std::cout << request.str() << std::endl;
         HttpResponse response = router.dispatch(request);
 
+        if (request.header.connection == "close")
+            response.header.connection = "close";
+
         send(client_fd, response.str().data(), response.str().size(), 0);
         std::cout << response.str() << "\n";
+
+        if (response.header.connection == "close") break;
     }
 
     close(client_fd);

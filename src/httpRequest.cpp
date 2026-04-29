@@ -7,7 +7,8 @@ HttpRequest::HttpRequest(const std::string& request) {
     const std::string hostStr = "Host: ",
                       userAgentStr = "User-Agent: ",
                       acceptStr = "Accept: ",
-                      acceptEncodingStr = "Accept-Encoding: ";
+                      acceptEncodingStr = "Accept-Encoding: ", 
+                      connectionStr = "Connection: ";
 
     auto extractHeader = [&](const std::string& key) -> std::string {
         size_t pos = request.find(key);
@@ -21,6 +22,7 @@ HttpRequest::HttpRequest(const std::string& request) {
     const std::string userAgent = extractHeader(userAgentStr);
     const std::string accept = extractHeader(acceptStr);
     const std::string encoding = extractHeader(acceptEncodingStr);
+    const std::string connection = extractHeader(connectionStr);
 
     std::vector<std::string> acceptEncoding;
     std::istringstream ss(encoding);
@@ -37,7 +39,7 @@ HttpRequest::HttpRequest(const std::string& request) {
     method = request.substr(0, methodEndPos + 1);
     path = request.substr(methodEndPos + 2, pathEndPos - (methodEndPos + 2) + 1);
 
-    header = HttpRequestHeader(host, userAgent, accept, acceptEncoding);
+    header = HttpRequestHeader(host, userAgent, accept, acceptEncoding, connection);
 
     // header end with \r\n\r\n
     size_t headerEndPos = request.find("\r\n\r\n");
@@ -54,5 +56,6 @@ std::string HttpRequest::str() const {
            "User-Agent: " + header.userAgent + "\n" +
            "Accept: " + header.accept + "\n" +
            (acceptEncoding.empty() ? "" : "Accept-Encoding: " + acceptEncoding + "\n") + 
+           "Connection: " + header.connection + "\n" + 
            "\n" + body;
 }
