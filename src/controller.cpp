@@ -16,7 +16,7 @@ HttpResponse userAgentHandler(HttpRequest const& request) {
     return HttpResponse("200 OK", "text/plain", request.header.userAgent, request.header.acceptEncodings);
 }
 
-HttpResponse FileController::get(HttpRequest const& request) const {
+HttpResponse FileController::getFileHandler(HttpRequest const& request) const {
     std::string filename = request.path.substr(std::string("/files/").size());
     std::string filepath = directory + "/" + filename;
 
@@ -29,7 +29,7 @@ HttpResponse FileController::get(HttpRequest const& request) const {
     return HttpResponse("200 OK", "application/octet-stream", ss.str(), request.header.acceptEncodings);
 }
 
-HttpResponse FileController::post(const HttpRequest& request) const {
+HttpResponse FileController::postFileHandler(const HttpRequest& request) const {
     std::string filename = request.path.substr(std::string("/files/").size());
     std::string filepath = directory + "/" + filename;
 

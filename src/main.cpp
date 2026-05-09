@@ -17,7 +17,9 @@
 #include "httpResponse.hpp"
 #include "router.hpp"
 
-// manual dependency injection
+/// @brief Create router to bind each endpoint to a handler function. 
+/// @param directory top level directory used for FileController. 
+/// @return Router object
 static Router buildRouter(std::string const& directory = "") {
     Router router;
     router.addRoute("GET", "^/$", indexHandler);
@@ -26,18 +28,22 @@ static Router buildRouter(std::string const& directory = "") {
 
     FileController fileController(directory);
     router.addRoute("GET", "^/files/", [fileController](HttpRequest const& req) {
-        return fileController.get(req);
+        return fileController.getFileHandler(req);
     });
     router.addRoute("POST", "^/files/", [fileController](HttpRequest const& req) {
-        return fileController.post(req);
+        return fileController.postFileHandler(req);
     });
 
     return router;
 }
 
+/// @brief Handling client request. Support keep-alive
+/// @param client_fd client file descriptor 
+/// @param router Router object 
 void handleClientRequest(int client_fd, const Router& router) {
     std::cout << "Client connected\n\n";
 
+    // keep-alive
     while (true) {
         std::string rawRequest(1024, '\0');
         ssize_t n = recv(client_fd, rawRequest.data(), rawRequest.size(), 0);
@@ -46,6 +52,9 @@ void handleClientRequest(int client_fd, const Router& router) {
 
         HttpRequest request(rawRequest);
         std::cout << request.str() << std::endl;
+
+        // call handler here and return response
+        // refer to controller.cpp for handler functions
         HttpResponse response = router.dispatch(request);
 
         if (request.header.connection == "close")
@@ -68,6 +77,7 @@ int main(int argc, char** argv) {
     // You can use print statements as follows for debugging, they'll be visible when running tests.
     std::cout << "Logs from your program will appear here!\n";
     
+    // extract directory
     std::string directory;
     if (argc == 3) {
         if (std::string(argv[1]) == "--directory") directory = argv[2];
@@ -105,6 +115,7 @@ int main(int argc, char** argv) {
 
     Router router = buildRouter(directory);
 
+    // multithreading
     while (true) {
         struct sockaddr_in client_addr;
         socklen_t client_addr_len = sizeof(client_addr);
@@ -117,6 +128,7 @@ int main(int argc, char** argv) {
             continue;
         }
 
+        /// Concurrent connections
         std::thread([client_fd, &router]() {
             handleClientRequest(client_fd, router);
         }).detach();

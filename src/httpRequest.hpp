@@ -4,6 +4,9 @@
 #include <string>
 #include <vector>
 
+/**
+ * HttpRequestHeader class
+ */
 struct HttpRequestHeader {
     std::string host;
     std::string userAgent;
@@ -19,6 +22,15 @@ struct HttpRequestHeader {
         acceptEncodings(acceptEncodings), connection(connection) {}
 };
 
+/**
+ * HttpRequest class 
+ * 
+ * method: GET/POST/DELETE/etc.
+ * path: path of request. e.g. "/", "/index", "/echo/something", etc.
+ * header: HttpRequestHeader
+ * body: request body
+ * 
+ */
 struct HttpRequest {
     std::string method;
     std::string path;

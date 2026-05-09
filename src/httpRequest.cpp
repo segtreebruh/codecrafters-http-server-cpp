@@ -3,6 +3,13 @@
 #include <sstream>
 #include <vector>
 
+/**
+ * HttpRequest constructor
+ * 
+ * @param request: raw request string
+ * @return void
+ * @result Set up a HttqRequest object by parsing raw request string
+ */
 HttpRequest::HttpRequest(const std::string& request) {
     const std::string hostStr = "Host: ",
                       userAgentStr = "User-Agent: ",
@@ -46,6 +53,11 @@ HttpRequest::HttpRequest(const std::string& request) {
     body = request.substr(headerEndPos + 4);
 }
 
+/**
+ * HttpRequest string representation. 
+ * 
+ * @return string representation of HttpRequest, with all fields formatted
+ */
 std::string HttpRequest::str() const {
     std::string acceptEncoding;
     for (const auto& x : header.acceptEncodings)

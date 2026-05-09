@@ -2,6 +2,14 @@
 
 #include "gzip.hpp"
 
+/**
+ * HttpResponse constructor. 
+ * 
+ * Only constructed after most logic is done and waiting to return 
+ * (hence the field "status" - status is determined before object is created).
+ * 
+ * Can handle gzip compression before returning final result.
+ */
 HttpResponse::HttpResponse(std::string const& status,
                            std::string const& contentType, std::string body,
                            std::vector<std::string> const& encodings) : status(status) {
@@ -20,6 +28,11 @@ HttpResponse::HttpResponse(std::string const& status,
                                 contentEncoding);
 }
 
+/**
+ * HttpResponse string representation. 
+ *
+ * Format data before sending to server. 
+ */
 std::string HttpResponse::str() const {
     std::string raw = "HTTP/1.1 " + status + "\r\n";
 

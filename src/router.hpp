@@ -11,6 +11,7 @@
 
 using Handler = std::function<HttpResponse(HttpRequest const&)>;
 
+/// @brief Route class. Contains info about a certain Route (method, pattern, handler)
 struct Route {
     std::string method;
     std::regex pattern;
@@ -20,6 +21,7 @@ struct Route {
         : method(method), pattern(pattern), handler(handler) {}
 };
 
+/// @brief Router class to contain multiple Routes. 
 struct Router {
     void addRoute(std::string const&, std::string const&, Handler);
     HttpResponse dispatch(HttpRequest const&) const;
